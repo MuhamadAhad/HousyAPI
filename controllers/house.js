@@ -11,7 +11,7 @@ const defHouse = {
     },
   ],
   attributes: {
-    exclude: ["createdAt", "updatedAt", "CityId", "UserId"],
+    exclude: ["createdAt", "updatedAt", "CityId", "UserId", "description"],
   },
 };
 
@@ -75,11 +75,17 @@ exports.index = async (req, res) => {
 //Access level : public (owner & tenant)
 exports.show = async (req, res) => {
   try {
+    const detail = {
+      ...defHouse,
+      attributes: {
+        exclude: ["createdAt", "updatedAt", "CityId", "UserId"],
+      },
+    };
     const house = await House.findOne({
       where: {
         id: req.params.id,
       },
-      ...defHouse,
+      ...detail,
     });
     if (house) {
       res.status(200).send({ data: house });
@@ -118,11 +124,17 @@ exports.create = async (req, res) => {
           const newHouse = { ...req.body, UserId: req.user };
           const result = await House.create(newHouse);
           if (result.id) {
+            const detail = {
+              ...defHouse,
+              attributes: {
+                exclude: ["createdAt", "updatedAt", "CityId", "UserId"],
+              },
+            };
             const house = await House.findOne({
               where: {
                 id: result.id,
               },
-              ...defHouse,
+              ...detail,
             });
             if (house) {
               res.status(200).send({ data: house });
